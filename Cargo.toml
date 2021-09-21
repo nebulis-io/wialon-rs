@@ -3,6 +3,8 @@ name = "wialon-rs"
 version = "0.1.0"
 authors = ["Thomas Nicollet <thomas.nicollet@nebulis.io>"]
 edition = "2018"
+license = "MIT"
+description = "Wialon API friendly lib"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
