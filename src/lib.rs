@@ -9,7 +9,6 @@ pub struct WialonApi {
     pub base_url: String,
     pub client: reqwest::Client,
     pub sid: Option<String>,
-    pub token: String,
 }
 
 impl WialonApi {
@@ -18,7 +17,7 @@ impl WialonApi {
         endpoint: T,
     ) -> Result<T::Response, reqwest::Error> {
         endpoint
-            .send(&self.client, &self.base_url, self.sid.as_ref(), &self.token)
+            .send(&self.client, &self.base_url, self.sid.as_ref())
             .await
     }
 

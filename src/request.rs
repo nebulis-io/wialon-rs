@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use reqwest::Response;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize)]
@@ -22,12 +23,15 @@ pub trait WialonRequest: Sync {
         reqwest::Method::POST
     }
 
+    async fn get_output(&self, response: Response) -> Result<Self::Response, reqwest::Error> {
+        response.json::<Self::Response>().await
+    }
+
     async fn send(
         &self,
         client: &reqwest::Client,
         base_url: &str,
         sid: Option<&String>,
-        token: &str,
     ) -> Result<Self::Response, reqwest::Error> {
         let params = self.params();
 
@@ -39,9 +43,8 @@ pub trait WialonRequest: Sync {
 
         let response = if self.method() == reqwest::Method::POST {
             client
-                .request(self.method(), format!("{}/wialon/proxy", base_url))
+                .request(self.method(), base_url.to_string())
                 .header("Content-Type", "application/x-www-form-urlencoded")
-                .bearer_auth(&token)
                 .form(&wialon_form_data)
                 .send()
                 .await?
@@ -49,14 +52,10 @@ pub trait WialonRequest: Sync {
             let form_data = serde_urlencoded::to_string(&wialon_form_data).unwrap();
 
             client
-                .request(
-                    self.method(),
-                    format!("{}/wialon/proxy?{}", base_url, form_data),
-                )
-                .bearer_auth(&token)
+                .request(self.method(), format!("{}?{}", base_url, form_data))
                 .send()
                 .await?
         };
-        Ok(response.json::<Self::Response>().await?)
+        self.get_output(response).await
     }
 }

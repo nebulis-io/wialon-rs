@@ -1,4 +1,6 @@
 use crate::request::WialonRequest;
+use async_trait::async_trait;
+use reqwest::Response;
 use serde::{Deserialize, Serialize};
 use serde_repr::*;
 
@@ -46,10 +48,11 @@ pub struct ExportResultResponse {
     pub location: String,
 }
 
+#[async_trait]
 impl WialonRequest for ExportResult {
     type Params = ExportResultParams;
 
-    type Response = ExportResultResponse;
+    type Response = Vec<u8>;
 
     fn service_name(&self) -> &str {
         "report/export_result"
@@ -61,5 +64,9 @@ impl WialonRequest for ExportResult {
 
     fn params(&self) -> &Self::Params {
         &self.params
+    }
+
+    async fn get_output(&self, response: Response) -> Result<Self::Response, reqwest::Error> {
+        Ok(response.bytes().await?.to_vec())
     }
 }
