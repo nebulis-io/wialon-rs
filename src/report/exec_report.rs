@@ -1,18 +1,21 @@
+use std::collections::HashMap;
+
 use crate::request::WialonRequest;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 pub struct ExecuteReport {
     pub params: ExecuteReportParams,
 }
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default,Debug)]
 pub struct ExecuteReportInterval {
     pub from: u32,
     pub to: u32,
     pub flags: u32,
 }
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ExecuteReportParams {
     pub report_resource_id: i64,
@@ -22,10 +25,14 @@ pub struct ExecuteReportParams {
     pub report_object_id_list: Vec<u32>,
     pub interval: ExecuteReportInterval,
     pub remote_exec: Option<u32>,
+    pub report_template: Option<Value>,
 }
 
 #[derive(Deserialize, Debug)]
-pub struct ExecuteReportReportResult {}
+pub struct ExecuteReportReportResult {
+    #[serde(flatten)]
+    _extra: HashMap<String, Value>
+}
 
 #[derive(Deserialize, Debug)]
 pub struct ExecuteReportReportLayer {
@@ -46,7 +53,10 @@ pub struct ExecuteReportResult {
 #[serde(rename_all = "camelCase")]
 pub enum ExecuteReportResponse {
     FullResult(ExecuteReportResult),
-    RemotelyExecuted {},
+    RemotelyExecuted {
+        #[serde(flatten)]
+        _extra: HashMap<String, Value>
+    },
 }
 
 impl WialonRequest for ExecuteReport {

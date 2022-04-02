@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use reqwest::Response;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 struct WialonFormData {
     #[serde(skip_serializing_if = "Option::is_none")]
     sid: Option<String>,
